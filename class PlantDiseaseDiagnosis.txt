@@ -1,0 +1,284 @@
+class PlantDiseaseDiagnosis:
+    def __init__(self):
+        self.rose_diseases = {
+            "Black Spot": {
+                "symptoms": ["Black spots with yellow halo", "Leaves turn yellow and drop"],
+                "treatment": {
+                    "fungicide": "Mancozeb (Dithane M-45)",
+                    "dosage": "2g per liter",
+                    "frequency": "Every 7-10 days",
+                    "spray_time": "Early morning or late evening",
+                    "medicine_type": "mancozeb"
+                }
+            },
+            "Powdery Mildew": {
+                "symptoms": ["White powdery coating on leaves", "Leaves curl and drop"],
+                "treatment": {
+                    "fungicide": "Sulphur-based (Sulfex)",
+                    "dosage": "3g per liter",
+                    "frequency": "Every 7 days",
+                    "spray_time": "Early morning",
+                    "medicine_type": "sulphur"
+                }
+            },
+            "Aphid Infestation": {
+                "symptoms": ["Small green/black insects", "Sticky honeydew on leaves", "Curled leaves"],
+                "treatment": {
+                    "insecticide": "Imidacloprid (Confidor)",
+                    "dosage": "0.5ml per liter",
+                    "frequency": "Every 10-14 days",
+                    "spray_time": "Evening",
+                    "medicine_type": "imidacloprid"
+                }
+            },
+            "Rust": {
+                "symptoms": ["Orange-brown pustules on leaves", "Leaves yellow and drop"],
+                "treatment": {
+                    "fungicide": "Triadimefon (Bayleton)",
+                    "dosage": "1g per liter",
+                    "frequency": "Every 10 days",
+                    "spray_time": "Early morning",
+                    "medicine_type": "triadimefon"
+                }
+            }
+        }
+        
+        self.hibiscus_diseases = {
+            "Leaf Spot": {
+                "symptoms": ["Brown spots with yellow margins", "Spots merge and leaves drop"],
+                "treatment": {
+                    "fungicide": "Chlorothalonil (Daconil)",
+                    "dosage": "2ml per liter",
+                    "frequency": "Every 7-10 days",
+                    "spray_time": "Early morning",
+                    "medicine_type": "chlorothalonil"
+                }
+            },
+            "Bud Drop": {
+                "symptoms": ["Flower buds drop prematurely", "No visible pests"],
+                "treatment": {
+                    "fertilizer": "Potassium-rich (0-0-50)",
+                    "dosage": "5g per plant every 15 days",
+                    "hormone": "NAA (Naphthaleneacetic acid)",
+                    "hormone_dosage": "0.1g per liter",
+                    "medicine_type": "fertilizer"
+                }
+            },
+            "Mealybugs": {
+                "symptoms": ["White cottony masses", "Sticky leaves", "Yellowing"],
+                "treatment": {
+                    "insecticide": "Dimethoate (Rogor)",
+                    "dosage": "1.5ml per liter",
+                    "frequency": "Every 10 days",
+                    "spray_time": "Evening",
+                    "medicine_type": "dimethoate"
+                }
+            },
+            "Root Rot": {
+                "symptoms": ["Wilting despite watering", "Brown roots", "Stunted growth"],
+                "treatment": {
+                    "fungicide": "Carbendazim (Bavistin)",
+                    "dosage": "2g per liter (soil drench)",
+                    "frequency": "Once, repeat after 15 days if needed",
+                    "medicine_type": "carbendazim"
+                }
+            }
+        }
+        
+        # Dosage calculator data
+        self.sizes = {"small": 0.5, "medium": 1.0, "large": 2.0, "xlarge": 3.0}
+        self.base_dosages = {
+            "mancozeb": 2.0, "sulphur": 3.0, "imidacloprid": 0.5,
+            "triadimefon": 1.0, "chlorothalonil": 2.0, "dimethoate": 1.5,
+            "carbendazim": 2.0
+        }
+
+    def diagnose_rose(self, symptoms):
+        """Diagnose Rose diseases based on symptoms"""
+        symptoms = [s.lower() for s in symptoms]
+        matched_disease = None
+        best_match_score = 0
+        
+        for disease, info in self.rose_diseases.items():
+            symptom_list = [s.lower() for s in info["symptoms"]]
+            matches = len(set(symptoms) & set(symptom_list))
+            if matches > best_match_score:
+                best_match_score = matches
+                matched_disease = disease
+        
+        if matched_disease:
+            return {
+                "plant": "Rose",
+                "disease": matched_disease,
+                "confidence": f"{(best_match_score/len(self.rose_diseases[matched_disease]['symptoms']))*100:.1f}%",
+                **self.rose_diseases[matched_disease]
+            }
+        return None
+
+    def diagnose_hibiscus(self, symptoms):
+        """Diagnose Hibiscus diseases based on symptoms"""
+        symptoms = [s.lower() for s in symptoms]
+        matched_disease = None
+        best_match_score = 0
+        
+        for disease, info in self.hibiscus_diseases.items():
+            symptom_list = [s.lower() for s in info["symptoms"]]
+            matches = len(set(symptoms) & set(symptom_list))
+            if matches > best_match_score:
+                best_match_score = matches
+                matched_disease = disease
+        
+        if matched_disease:
+            return {
+                "plant": "Hibiscus",
+                "disease": matched_disease,
+                "confidence": f"{(best_match_score/len(self.hibiscus_diseases[matched_disease]['symptoms']))*100:.1f}%",
+                **self.hibiscus_diseases[matched_disease]
+            }
+        return None
+
+    def dosage_calculator(self, plant_size, medicine_type):
+        """Calculate exact dosage based on plant size"""
+        size_factor = self.sizes.get(plant_size.lower(), 1.0)
+        base_dose = self.base_dosages.get(medicine_type.lower(), 1.0)
+        total_dose = base_dose * size_factor
+        water_volume = size_factor
+        
+        return {
+            "total_medicine": f"{total_dose}g/ml",
+            "water_volume": f"{water_volume}L",
+            "solution": f"{total_dose}g/ml in {water_volume}L water",
+            "plant_size": plant_size.title()
+        }
+
+    def display_treatment(self, diagnosis):
+        """Display formatted treatment information with dosage calculator"""
+        print("\n" + "="*70)
+        print(f"🌱 DIAGNOSIS: {diagnosis['plant']} - {diagnosis['disease']} 🌱")
+        print(f"📊 Confidence: {diagnosis['confidence']}")
+        print("="*70)
+        
+        print("\n🔍 IDENTIFIED SYMPTOMS:")
+        for symptom in diagnosis['symptoms']:
+            print(f"   • {symptom}")
+        
+        print("\n💊 TREATMENT PROTOCOL:")
+        treatment = diagnosis['treatment']
+        medicine_type = treatment.get('medicine_type', 'general')
+        
+        if 'fungicide' in treatment:
+            print(f"\n🛡️ FUNGICIDE TREATMENT:")
+            print(f"   💉 Medicine: {treatment['fungicide']}")
+            print(f"   ⏰ Frequency: {treatment['frequency']}")
+            print(f"   🌅 Best Time: {treatment['spray_time']}")
+            
+        if 'insecticide' in treatment:
+            print(f"\n🐛 INSECTICIDE TREATMENT:")
+            print(f"   💉 Medicine: {treatment['insecticide']}")
+            print(f"   ⏰ Frequency: {treatment['frequency']}")
+            print(f"   🌅 Best Time: {treatment['spray_time']}")
+        
+        # Dosage calculator integration
+        print(f"\n📏 EXACT DOSAGE CALCULATOR (select your plant size):")
+        print("   S=Small (0.5L), M=Medium (1L), L=Large (2L), XL=XLarge (3L)")
+        size = input("   Enter plant size (S/M/L/XL): ").upper()
+        
+        dosage = self.dosage_calculator(size, medicine_type)
+        print(f"   🎯 RECOMMENDED: {dosage['solution']} ({dosage['plant_size']})")
+        
+        print(f"\n⚠️  SAFETY PRECAUTIONS:")
+        print("   • Wear gloves, mask, and protective clothing")
+        print("   • Spray in early morning or evening (avoid hot sun)")
+        print("   • Keep children/pets away during application")
+        print("   • Test spray on 1-2 leaves first")
+        print("   • Water plants well before treatment")
+        print("   • Store medicines away from food")
+        print("="*70 + "\n")
+
+    def show_all_diseases(self, plant_type):
+        """Show all diseases for selected plant"""
+        if plant_type.lower() == "rose":
+            diseases = self.rose_diseases
+            plant_name = "🌹 ROSE"
+        else:
+            diseases = self.hibiscus_diseases
+            plant_name = "🌺 HIBISCUS"
+        
+        print(f"\n{plant_name} - ALL COMMON DISEASES & TREATMENTS")
+        print("-" * 50)
+        for disease, info in diseases.items():
+            print(f"\n{disease}:")
+            print(f"   Symptoms: {', '.join(info['symptoms'])}")
+            print(f"   Treatment: {info['treatment']['fungicide' if 'fungicide' in info['treatment'] else 'insecticide' if 'insecticide' in info['treatment'] else 'fertilizer']}")
+            dosage = self.dosage_calculator("medium", info['treatment']['medicine_type'])
+            print(f"   Dosage (Medium plant): {dosage['solution']}")
+
+def main():
+    diagnosis = PlantDiseaseDiagnosis()
+    
+    while True:
+        print("\n" + "="*50)
+        print("🌿 PLANT DISEASE DIAGNOSTIC & DOSAGE SYSTEM 🌿")
+        print("="*50)
+        print("1. 🔍 Diagnose Disease")
+        print("2. 📋 Show All Diseases")
+        print("3. 🧮 Dosage Calculator Only")
+        print("4. 🚪 Exit")
+        
+        choice = input("\nSelect option (1-4): ").strip()
+        
+        if choice == "1":
+            print("\n🌱 SELECT PLANT TYPE:")
+            print("1. Rose 🌹")
+            print("2. Hibiscus 🌺")
+            plant_choice = input("Enter choice (1 or 2): ")
+            
+            print("\n📝 Enter observed symptoms (Enter 'done' when finished):")
+            symptoms = []
+            while True:
+                symptom = input("Symptom: ").strip()
+                if symptom.lower() == 'done':
+                    break
+                if symptom:
+                    symptoms.append(symptom)
+            
+            if not symptoms:
+                print("No symptoms entered. Please try again.")
+                continue
+            
+            # Diagnose
+            if plant_choice == "1":
+                result = diagnosis.diagnose_rose(symptoms)
+            else:
+                result = diagnosis.diagnose_hibiscus(symptoms)
+            
+            if result:
+                diagnosis.display_treatment(result)
+            else:
+                print("\n❌ No specific match found. General care:")
+                print("• Proper watering schedule")
+                print("• Good air circulation")
+                print("• Remove infected parts")
+                print("• Apply preventive Mancozeb (2g/L) monthly")
+        
+        elif choice == "2":
+            print("\nSelect plant for complete disease list:")
+            plant = input("Rose/R/Hibiscus/H (R/H): ").lower()
+            diagnosis.show_all_diseases("rose" if plant in ['r', 'rose'] else "hibiscus")
+        
+        elif choice == "3":
+            print("\n🧮 DOSAGE CALCULATOR")
+            medicine = input("Enter medicine name (mancozeb/imidacloprid/etc): ").lower()
+            size = input("Plant size (S/M/L/XL): ").upper()
+            dosage = diagnosis.dosage_calculator(size, medicine)
+            print(f"\n🎯 {dosage['solution']}")
+        
+        elif choice == "4":
+            print("👋 Thank you for using Plant Doctor!")
+            break
+        
+        else:
+            print("❌ Invalid option. Please try again.")
+
+if __name__ == "__main__":
+    main()
